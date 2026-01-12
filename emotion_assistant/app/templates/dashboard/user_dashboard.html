@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+    
+</head>
+<body>
+
+<div class="app-container">
+
+    
+
+
+    <aside class="sidebar">
+        <h2 class="logo">ReMindCare</h2>
+
+        <nav class="menu">
+            <a href="{% url 'dashboard' %}" class="menu-item">🏠 Dashboard</a>
+            <a href="{% url 'routine_page' %}" class="menu-item">📋 Routines</a>
+            <a href="{% url 'reminder_page' %}" class="menu-item">⏰ Reminders</a>
+            <a href="{% url 'medication' %}"class="menu-item">💊 Medication</a>
+            <a href="{% url 'memory' %}" class="menu-item">🧠 Memory Log</a>
+            <a href="{% url 'family' %}"class="menu-item">📞 Call Family</a>
+            <a href="{% url 'profile' %}" class="menu-item">👤 Profile</a>
+            <a href="{% url 'logout' %}" class="menu-item logout">🚪 Logout</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+        <!-- Header -->
+        <header class="header">
+            <h1>Hi {{ request.user.username }} 👋</h1>
+            <p>Good morning! How can I assist you today?</p>
+        </header>
+
+        <!-- Voice Assistant Card -->
+        <section class="card large-card">
+            <div class="card-left">
+                <h3>Alzheimer's Mode</h3>
+                <!-- <p>10:45 AM · Sunny 72°F</p> -->
+                <!-- <button class="primary-btn">🎤 Start Voice Assistant</button> -->
+                <!-- <a href="{% url 'chatbot_page' %}" class="primary-btn">💬 Talk to AI</a> -->
+
+                <!-- <button class="secondary-btn">🔁 Explain Again</button> -->
+
+                <!-- ✅ CAMERA CONTROLS -->
+                <div style="margin-top:12px;">
+                    <button onclick="startCamera()" class="primary-btn">📷 Start Camera</button>
+                    <button onclick="stopCamera()" class="secondary-btn">⏹ Stop Camera</button>
+                    <a href="{% url 'chatbot_page' %}" class="primary-btn">💬 Talk to AI</a>
+                    <button id="voiceBtn" class="primary-btn">🎤 Start Voice Assistant</button>
+                    <p id="assistantStatus"></p>
+
+
+
+                </div>
+                
+
+                <div style="margin-top:12px;">
+                    <img id="cameraFeed"
+                         style="width:320px;height:240px;border-radius:12px;border:1px solid #ddd;display:none;"
+                         alt="Live camera will appear here">
+
+                    <!-- ✅ EMOTION TEXT -->
+                    <p id="emotionText"
+                       style="margin-top:8px;font-weight:600;color:#333;display:none;">
+                        Detected: --
+                    </p>
+                </div>
+                <!-- ✅ CAMERA CONTROLS END -->
+
+
+            </div>
+            
+            <div class="card-right">
+<img src="/media/assistant_images/default.avif" alt="Assistant">
+            </div>
+        </section>
+
+        <!-- Feature Buttons -->
+        <section class="features">
+          <a href="{% url 'routine_page' %}" class="feature-card">🗓 Daily Routine</a>
+          <a href="{% url 'medication' %}"><div class="feature-card">💊 Medication</div></a>
+          <a href="{% url 'memory' %}" class="feature-card">🧠 Memory Log</a>
+          <div class="feature-card">
+            <a href="{% url 'family' %}">📞 Call Family</a>
+          </div>
+        </section>
+
+        <!-- ✅ DAILY ROUTINE CARD (DYNAMIC) -->
+        <section class="card routine-card">
+            <h3>Daily Routine</h3>
+
+            {% if routines %}
+                <ul class="routine-list">
+                    {% for routine in routines %}
+                        <li class="{% if routine.completed %}done{% endif %}">
+                            <span class="time">
+                                {{ routine.time|time:"h:i A" }}
+                            </span>
+
+                            <span class="title">
+                                {{ routine.title }}
+                            </span>
+
+                            {% if not routine.completed %}
+                                <button
+                                    class="routine-btn"
+                                    onclick="markRoutineDone({{ routine.id }})">
+                                    ✔
+                                </button>
+                            {% else %}
+                                <span class="completed">Completed</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No routines for today</p>
+            {% endif %}
+        </section>
+
+        <!-- Bottom Section -->
+        <section class="bottom">
+
+            
+
+        </section>
+
+    </main>
+</div>
+
+
+<!-- ✅ ROUTINE ACTION SCRIPT -->
+<script src="{% static 'app/js/dashboard.js' %}"></script>
+<script src="{% static 'app/js/voice_assistant.js' %}"></script>
+
+<!-- ✅ CAMERA + EMOTION SCRIPT -->
+<script>
+function startCamera() {
+    let cam = document.getElementById("cameraFeed");
+    let emotion = document.getElementById("emotionText");
+
+    cam.style.display = "block";
+    emotion.style.display = "block";
+    emotion.innerText = "Detecting emotion...";
+
+    cam.src = "{% url 'live_camera' %}";
+}
+
+function stopCamera() {
+    let cam = document.getElementById("cameraFeed");
+    let emotion = document.getElementById("emotionText");
+
+    cam.src = "";
+    cam.style.display = "none";
+
+    emotion.innerText = "Detected: --";
+    emotion.style.display = "none";
+}
+</script>
+
+</body>
+</html>

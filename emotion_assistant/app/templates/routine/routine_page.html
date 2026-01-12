@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily Routine</title>
+    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+</head>
+<body>
+
+<div class="app-container">
+    <h2>🗓 Daily Routine</h2>
+
+    <a href="{% url 'add_routine' %}" class="primary-btn">
+        ➕ Add Routine
+    </a>
+
+    <ul class="routine-list">
+    {% for routine in routines %}
+        <li class="{% if routine.completed %}done{% endif %}">
+            {{ routine.time|time:"h:i A" }} — {{ routine.title }}
+
+            {% if not routine.completed %}
+                <button onclick="markRoutineDone({{ routine.id }})">✔</button>
+            {% else %}
+                <span class="completed">Done</span>
+            {% endif %}
+        </li>
+    {% empty %}
+        <li>No routines yet</li>
+    {% endfor %}
+    </ul>
+</div>
+
+<script>
+function markRoutineDone(id) {
+    fetch(`/routine/done/${id}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    }).then(() => location.reload());
+}
+</script>
+
+</body>
+</html>

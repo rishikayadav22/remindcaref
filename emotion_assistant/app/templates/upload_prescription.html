@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+  <div class="col-md-8 offset-md-2">
+    <h3>Upload Prescription for {{ patient.first_name }} {{ patient.last_name }}</h3>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn btn-primary">Upload & OCR</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

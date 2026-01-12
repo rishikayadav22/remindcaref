@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Routine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Inter",sans-serif;
+}
+
+body{
+  background:linear-gradient(180deg,#f6f8ff,#eef2ff);
+}
+
+/* Layout */
+.page{
+  display:flex;
+  min-height:100vh;
+}
+
+/* Sidebar */
+.sidebar{
+  width:240px;
+  background:#fff;
+  padding:24px;
+  box-shadow:2px 0 20px rgba(0,0,0,.05);
+}
+
+.logo{
+  font-size:22px;
+  font-weight:700;
+  color:#4f46e5;
+  margin-bottom:30px;
+}
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.menu-item{
+  text-decoration:none;
+  color:#374151;
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:500;
+}
+
+.menu-item:hover,
+.menu-item.active{
+  background:#eef2ff;
+  color:#4f46e5;
+}
+
+.logout{
+  margin-top:30px;
+  color:#e11d48;
+}
+
+/* Main */
+.content{
+  flex:1;
+  padding:40px;
+}
+
+/* Card */
+.form-card{
+  max-width:480px;
+  background:#fff;
+  padding:32px;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,.08);
+}
+
+h2{
+  font-size:26px;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  color:#6b7280;
+  margin-bottom:24px;
+}
+
+form p{
+  margin-bottom:18px;
+}
+
+input, select{
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid #d1d5db;
+  font-size:14px;
+}
+
+input:focus{
+  outline:none;
+  border-color:#4f46e5;
+}
+
+/* Buttons */
+.btn-row{
+  display:flex;
+  justify-content:space-between;
+  margin-top:25px;
+}
+
+button{
+  background:#4f46e5;
+  color:#fff;
+  border:none;
+  padding:12px 24px;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.cancel{
+  text-decoration:none;
+  padding:12px 24px;
+  border-radius:14px;
+  border:2px solid #e0e7ff;
+  color:#4f46e5;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+        <h2 class="logo">ReMindCare</h2>
+
+        <nav class="menu">
+            <a href="{% url 'dashboard' %}" class="menu-item">🏠 Dashboard</a>
+            <a href="{% url 'routine_page' %}" class="menu-item">📋 Routines</a>
+            <a href="{% url 'reminder_page' %}" class="menu-item">⏰ Reminders</a>
+            <a href="{% url 'medication' %}"class="menu-item">💊 Medication</a>
+            <a href="{% url 'memory' %}" class="menu-item">🧠 Memory Log</a>
+            <a href="{% url 'family' %}"class="menu-item">📞 Call Family</a>
+            <a href="{% url 'profile' %}" class="menu-item">👤 Profile</a>
+            <a href="{% url 'logout' %}" class="menu-item logout">🚪 Logout</a>
+        </nav>
+    </aside>
+
+<!-- Content -->
+<main class="content">
+
+<div class="form-card">
+  <h2>Add Daily Routine</h2>
+  <p class="subtitle">Create a routine to structure your day.</p>
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div class="btn-row">
+      <a href="{% url 'routine_page' %}" class="cancel">Cancel</a>
+      <button type="submit">＋ Add Routine</button>
+    </div>
+  </form>
+</div>
+
+</main>
+</div>
+
+</body>
+</html>

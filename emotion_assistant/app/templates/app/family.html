@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Call Family | ReMindCare</title>
+    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <h2 class="logo">ReMindCare</h2>
+
+        <nav class="menu">
+            <a href="{% url 'dashboard' %}" class="menu-item">🏠 Dashboard</a>
+            <a href="{% url 'routine_page' %}" class="menu-item">📋 Routines</a>
+            <a href="{% url 'reminder_page' %}" class="menu-item">⏰ Reminders</a>
+            <a href="{% url 'medication' %}" class="menu-item">💊 Medication</a>
+            <a href="{% url 'memory' %}" class="menu-item">🧠 Memory Log</a>
+            <a href="{% url 'family' %}" class="menu-item active">📞 Call Family</a>
+            <a href="{% url 'profile' %}" class="menu-item">👤 Profile</a>
+            <a href="{% url 'logout' %}" class="menu-item logout">🚪 Logout</a>
+        </nav>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="content">
+
+        <!-- Breadcrumb -->
+        <p class="breadcrumb">
+            &lt;&lt; AI Assistive &nbsp;›&nbsp; Call Family
+        </p>
+
+        <!-- Page Header -->
+        <div class="page-header-row">
+            <div>
+                <h1>Call Family</h1>
+                <p class="page-subtitle">
+                    Quickly contact your family members or caretaker.
+                </p>
+            </div>
+
+            <button class="primary-btn" onclick="openModal()">
+                ➕ Add Contact
+            </button>
+        </div>
+
+        <!-- Contacts Card -->
+        <div class="card">
+            <h3>Family Contacts</h3>
+
+            <div class="contacts-grid">
+                {% for contact in contacts %}
+                <div class="contact-card">
+
+                    {% if contact.photo %}
+                        <img src="{{ contact.photo.url }}" alt="{{ contact.name }}">
+                    {% else %}
+                        <img src="{% static 'images/default-user.png' %}" alt="Default User">
+                    {% endif %}
+
+                    <h4>{{ contact.name }}</h4>
+                    <p class="relation">{{ contact.relation }}</p>
+                    <p class="phone">{{ contact.phone }}</p>
+
+                    <a href="tel:{{ contact.phone }}" class="primary-btn">
+                        📞 Call
+                    </a>
+                </div>
+                {% empty %}
+                    <p class="empty-text">No contacts added yet.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Emergency Call -->
+            <div class="emergency">
+                <a href="tel:911" class="secondary-btn danger">
+                    🚨 Call Emergency
+                </a>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ================= ADD CONTACT MODAL ================= -->
+<div id="contactModal" class="modal">
+    <div class="modal-content">
+        <h3>Add Family Contact</h3>
+
+        <form method="POST" action="{% url 'add_family_contact' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <label>Name</label>
+            <input type="text" name="name" required>
+
+            <label>Relationship</label>
+            <input type="text" name="relation" placeholder="Mother, Father, Son..." required>
+
+            <label>Phone Number</label>
+            <input type="tel" name="phone" required>
+
+            <label>Photo (optional)</label>
+            <input type="file" name="photo">
+
+            <div class="modal-actions">
+                <button type="submit" class="primary-btn">Save</button>
+                <button type="button" class="secondary-btn" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= JAVASCRIPT ================= -->
+<script>
+function openModal() {
+    document.getElementById("contactModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("contactModal").style.display = "none";
+}
+</script>
+
+</body>
+</html>

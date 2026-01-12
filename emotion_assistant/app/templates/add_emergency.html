@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Emergency Contact</title>
+  <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+</head>
+<body>
+  <div class="page">
+    <h2>Add Emergency Contact</h2>
+    <form method="post" action="" class="card">
+      {% csrf_token %}
+      <label>Name</label><br>
+      <input type="text" name="name" required class="form-control"><br>
+      <label>Relation</label><br>
+      <input type="text" name="relation" required class="form-control"><br>
+      <label>Phone</label><br>
+      <input type="text" name="phone" required class="form-control"><br><br>
+      <button type="submit" class="btn">Save</button>
+      <a href="{% url 'profile' %}" class="btn">Cancel</a>
+    </form>
+  </div>
+</body>
+</html>

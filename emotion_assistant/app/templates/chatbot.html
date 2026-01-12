@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Chatbot</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'app/css/chatbot.css' %}">
+</head>
+<body>
+
+    <div class="chat-wrapper">
+        <div class="chat-card">
+
+            <!-- Header -->
+            <div class="chat-header">
+                🤖 <span>AI Assistant</span>
+            </div>
+
+            <!-- Chat messages area -->
+            <div class="chat-box" id="chat-box">
+                <!-- Messages will appear here -->
+            </div>
+
+            <!-- Input area -->
+            <div class="chat-input">
+                <input
+                    type="text"
+                    id="user-input"
+                    placeholder="Ask me anything..."
+                    autocomplete="off"
+                >
+                <button onclick="sendMessage()">Send</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Optional JS (basic placeholder) -->
+    <script>
+        function sendMessage() {
+            const input = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+
+            if (input.value.trim() === "") return;
+
+            const message = document.createElement("div");
+            message.textContent = input.value;
+            message.style.margin = "6px 0";
+
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            input.value = "";
+        }
+    </script>
+
+</body>
+</html>

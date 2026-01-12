@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Profile</title>
+  <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+
+  <style>
+    /* Remove browser default spacing */
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Main content area */
+    .page {
+      margin-left: 240px;          /* sidebar width */
+      padding: 0 40px;             /* 🔥 NO top padding */
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;     /* stick to top */
+      min-height: 100vh;
+    }
+
+    /* Card */
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 26px;
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      margin: 0;                   /* 🔥 absolutely no margin */
+    }
+
+    h2 {
+      text-align: center;
+      margin: 0 0 18px 0;          /* remove top margin */
+      font-weight: 600;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    a.btn {
+      text-decoration: none;
+      line-height: 38px;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .page {
+        margin-left: 0;
+        padding: 0 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="logo">ReMindCare</h2>
+    <nav class="menu">
+      <a href="{% url 'dashboard' %}" class="menu-item">🏠 Dashboard</a>
+      <a href="{% url 'routine_page' %}" class="menu-item">📋 Routines</a>
+      <a href="{% url 'reminder_page' %}" class="menu-item">⏰ Reminders</a>
+      <a href="{% url 'medication' %}" class="menu-item">💊 Medication</a>
+      <a href="{% url 'memory' %}" class="menu-item">🧠 Memory Log</a>
+      <a href="{% url 'family' %}" class="menu-item">📞 Call Family</a>
+      <a href="{% url 'profile' %}" class="menu-item">👤 Profile</a>
+      <a href="{% url 'logout' %}" class="menu-item logout">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- Content -->
+  <div class="page">
+    <form method="post" enctype="multipart/form-data" class="card">
+      {% csrf_token %}
+
+      <h2>Edit Profile</h2>
+
+      <label>First name</label>
+      <input type="text" name="first_name" value="{{ request.user.first_name }}" class="form-control">
+
+      <label>Last name</label>
+      <input type="text" name="last_name" value="{{ request.user.last_name }}" class="form-control">
+
+      <label>Phone</label>
+      <input type="text" name="phone" value="{{ profile.phone }}" class="form-control">
+
+      <label>Avatar</label>
+      <input type="file" name="avatar" class="form-control">
+
+      <div class="action-buttons">
+        <button type="submit" class="btn">Save</button>
+        <a href="{% url 'profile' %}" class="btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+  </div>
+
+</body>
+</html>

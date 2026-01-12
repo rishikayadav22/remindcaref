@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reminders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: #5a67ff;
+            margin-bottom: 30px;
+        }
+
+        .menu a {
+            display: block;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: #eef1ff;
+            color: #5a67ff;
+        }
+
+        /* Main */
+        .content {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .page-title {
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* Card */
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .completed {
+            color: green;
+            font-weight: 600;
+        }
+
+        .upcoming {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .edit-btn {
+            background: #eef1ff;
+            color: #5a67ff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .delete-btn {
+            background: #ffdddd;
+            color: #b00020;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 6px;
+        }
+
+        /* Add Reminder */
+        .add-reminder-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 22px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        }
+
+        .add-reminder-form {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .add-reminder-form textarea,
+        .add-reminder-form input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+        }
+
+        .add-reminder-btn {
+            background: #5a67ff;
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2 class="logo">ReMindCare</h2>
+        <nav class="menu">
+            <a href="{% url 'dashboard' %}">🏠 Dashboard</a>
+            <a href="{% url 'routine_page' %}">📋 Routines</a>
+            <a href="{% url 'reminder_page' %}" class="active">⏰ Reminders</a>
+            <a href="{% url 'medication' %}">💊 Medication</a>
+            <a href="{% url 'memory' %}">🧠 Memory Log</a>
+            <a href="{% url 'family' %}">📞 Call Family</a>
+            <a href="{% url 'profile' %}">👤 Profile</a>
+            <a href="{% url 'logout' %}">🚪 Logout</a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="content">
+
+        <h1 class="page-title">Reminders</h1>
+        <p class="subtitle">Manage and schedule reminders to stay on track.</p>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reminder</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reminders %}
+                    <tr data-time="{{ r.reminder_time|date:'H:i' }}">
+                        <td>🔔 {{ r.message }}</td>
+                        <td>{{ r.reminder_time }}</td>
+                        <td>
+                            {% if r.completed %}
+                                <span class="completed">✔ Completed</span>
+                            {% else %}
+                                <span class="upcoming">⏰ Upcoming</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'edit_reminder' r.id %}" class="edit-btn">✏ Edit</a>
+
+                            <form method="post" action="{% url 'delete_reminder' r.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn">🗑 Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">No reminders available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Reminder -->
+        <div class="add-reminder-card">
+            <form method="post" class="add-reminder-form">
+                {% csrf_token %}
+                {{ form.message }}
+                {{ form.reminder_time }}
+                <button type="submit" class="add-reminder-btn">＋ Add Reminder</button>
+            </form>
+        </div>
+
+    </main>
+</div>
+
+<!-- Alarm -->
+<audio id="alarmSound">
+    <source src="{% static 'app/sounds/alarm.mp3' %}" type="audio/mpeg">
+</audio>
+
+<script>
+setInterval(() => {
+    const now = new Date();
+    const currentTime = now.toTimeString().slice(0,5);
+
+    document.querySelectorAll("tr[data-time]").forEach(row => {
+
+        if (row.dataset.triggered === "true") return;
+
+        if (row.dataset.time === currentTime) {
+            document.getElementById("alarmSound").play();
+            alert("🔔 Reminder: " + row.children[0].innerText);
+            row.children[2].innerHTML = '<span class="completed">✔ Completed</span>';
+            row.dataset.triggered = "true";
+        }
+    });
+}, 60000);
+</script>
+
+</body>
+</html>

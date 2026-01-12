@@ -1,0 +1,29 @@
+<aside class="sidebar">
+  <h2 class="logo">ReMindCare</h2>
+
+  <nav>
+    <a href="{% url 'dashboard' %}" class="nav-item">
+      🏠 Dashboard
+    </a>
+
+    <a href="{% url 'routine_page' %}" class="nav-item">
+      📋 Routines
+    </a>
+
+    <a href="{% url 'reminders' %}" class="nav-item">
+      ⏰ Reminders
+    </a>
+
+    <a href="{% url 'memory' %}" class="nav-item">
+      🧠 Mind Boost
+    </a>
+
+    <a href="{% url 'profile' %}" class="nav-item active">
+      👤 Profile
+    </a>
+
+    <a href="{% url 'logout' %}" class="nav-item logout">
+      🚪 Logout
+    </a>
+  </nav>
+</aside>

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1>Routines</h1>
+  <a href="{% url 'add_routine' %}" class="btn primary">+ Add Routine</a>
+</div>
+
+<div class="routine-grid">
+  {% for routine in routines %}
+  <div class="card routine-card">
+    <div class="routine-header">
+      <span class="icon">{{ routine.icon }}</span>
+      <h3>{{ routine.name }}</h3>
+    </div>
+
+    <div class="routine-actions">
+      <a href="#" class="btn">Edit</a>
+      <a href="#" class="btn delete">Disable</a>
+    </div>
+  </div>
+  {% empty %}
+  <p>No routines found.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Routines</h1>
+  <p class="subtitle">Set up daily routines to help stay organized and on track.</p>
+</div>
+
+<div class="routine-grid">
+  {% for routine in routines %}
+  <div class="routine-card">
+    <div class="routine-top">
+      <div class="routine-icon">{{ routine.icon }}</div>
+
+      <div class="routine-info">
+        <h3>{{ routine.name }}</h3>
+
+        {% for task in routine.tasks.all %}
+          <p>{{ task.time|time:"g:i A" }} - {{ task.description }}</p>
+        {% endfor %}
+      </div>
+
+      <a href="{% url 'edit_routine' routine.id %}" class="btn edit-btn">
+        ✏ Edit
+      </a>
+    </div>
+  </div>
+  {% empty %}
+    <p>No routines found.</p>
+  {% endfor %}
+</div>
+
+<div class="add-routine-wrapper">
+  <a href="{% url 'add_routine' %}" class="btn add-btn">
+    ➕ Add New Routine
+  </a>
+</div>
+
+<!-- Inactive routines -->
+<div class="inactive-section">
+  <h3>Inactive Routines</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Routine Name</th>
+        <th>Time</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td colspan="3" class="empty">
+          No inactive routines found.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button class="btn secondary">View Routine History</button>
+</div>
+{% endblock %}

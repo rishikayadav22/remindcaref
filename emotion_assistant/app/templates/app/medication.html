@@ -1,0 +1,88 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medication</title>
+    <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+</head>
+
+<body>
+<div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h2 class="logo">ReMindCare</h2>
+
+        <nav class="menu">
+            <a href="{% url 'dashboard' %}" class="menu-item">🏠 Dashboard</a>
+            <a href="{% url 'routine_page' %}" class="menu-item">📋 Routines</a>
+            <a href="{% url 'reminder_page' %}" class="menu-item">⏰ Reminders</a>
+            <a href="{% url 'medication' %}"class="menu-item">💊 Medication</a>
+            <a href="{% url 'memory' %}" class="menu-item">🧠 Memory Log</a>
+            <a href="{% url 'family' %}"class="menu-item">📞 Call Family</a>
+            <a href="{% url 'profile' %}" class="menu-item">👤 Profile</a>
+            <a href="{% url 'logout' %}" class="menu-item logout">🚪 Logout</a>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- Breadcrumb -->
+        <p class="breadcrumb">
+            &lt;&lt; AI Assistive &nbsp;›&nbsp; Medication
+        </p>
+
+
+        <h2 class="page-title">Medication</h2>
+        <p class="page-subtitle">
+            Scan your prescription to extract and manage your medications.
+        </p>
+
+        <!-- YOUR EXISTING CARDS -->
+        <div class="cards-container">
+
+            <!-- LEFT CARD -->
+            <div class="card">
+                <h3>Scan Prescription</h3>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="prescription" required>
+                    <div class="button-group">
+                        <button type="submit" class="primary-btn">
+                            Upload Image
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- RIGHT CARD -->
+            <div class="card">
+                <h3>Extracted Medications</h3>
+
+                {% if text %}
+                    <label class="section-label">Text Found:</label>
+                    <div class="text-box">{{ text }}</div>
+                {% endif %}
+
+                {% for med in medications %}
+                    <div class="medication-item">
+                        💊 <strong>{{ med.name }}</strong>
+                        <div class="med-details">
+                            {{ med.dosage }}<br>
+                            {{ med.instruction }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="empty-text">No medications detected</p>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+
+</html>

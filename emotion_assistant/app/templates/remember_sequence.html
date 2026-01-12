@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Remember the Sequence</h3>
+
+  {% if patient %}
+    <p><strong>Player:</strong> {{ patient.first_name }} {{ patient.last_name }}</p>
+  {% endif %}
+
+  <div class="row">
+    <!-- GAME AREA -->
+    <div class="col-md-6">
+      <div class="card p-3 text-center">
+        <div id="gameBoard" class="d-flex flex-wrap justify-content-center"
+             style="gap:10px; max-width:320px; margin: 0 auto;">
+
+          <div class="pad" id="pad0" data-color="0"
+               style="width:150px;height:150px;background:#ff4d4d;border-radius:12px;"></div>
+          <div class="pad" id="pad1" data-color="1"
+               style="width:150px;height:150px;background:#4dff4d;border-radius:12px;"></div>
+          <div class="pad" id="pad2" data-color="2"
+               style="width:150px;height:150px;background:#4d4dff;border-radius:12px;"></div>
+          <div class="pad" id="pad3" data-color="3"
+               style="width:150px;height:150px;background:#ffd24d;border-radius:12px;"></div>
+        </div>
+
+        <div class="mt-3">
+          <div><strong>Level:</strong> <span id="levelDisplay">0</span></div>
+          <div><strong>Round:</strong> <span id="roundDisplay">0</span></div>
+        </div>
+
+        <div class="mt-3">
+          <button id="startBtn" class="btn btn-primary">Start Game</button>
+          <button id="strictBtn" class="btn btn-outline-secondary">Strict: Off</button>
+          <button id="restartBtn" class="btn btn-warning">Restart</button>
+        </div>
+
+        <div class="mt-3 text-muted">
+          <small>Repeat the sequence of flashes by clicking the colored tiles.</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK -->
+    <div class="col-md-6">
+      <div class="card p-3">
+        <h5>Feedback</h5>
+        <div id="feedbackArea">Press <strong>Start Game</strong> to begin.</div>
+        <hr>
+        <h6>Your Latest Score</h6>
+        <div id="scoreArea">--</div>
+        <hr>
+        <div id="saveArea"></div>
+
+        <a href="{% url 'dashboard' %}" class="btn btn-link mt-3">Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.pad {
+  cursor: pointer;
+  box-shadow: 0 4px rgba(0,0,0,0.15);
+  transition: transform 0.12s, filter 0.12s;
+}
+.pad.active {
+  transform: scale(1.06);
+  filter: brightness(1.2);
+}
+</style>
+
+<script>
+/* ===================== CSRF HELPER ===================== */
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+/* ===================== VARIABLES ===================== */
+const pads = Array.from(document.querySelectorAll('.pad'));
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const strictBtn = document.getElementById('strictBtn');
+const feedback = document.getElementById('feedbackArea');
+const levelDisplay = document.getElementById('levelDisplay');
+const roundDisplay = document.getElementById('roundDisplay');
+const scoreArea = document.getElementById('scoreArea');
+const saveArea = document.getElementById('saveArea');
+
+let sequence = [];
+let userIndex = 0;
+let playingSequence = false;
+let level = 0;
+let strictMode = false;
+let lastScore = { level: 0, correct: 0 };
+
+/* ===================== AUDIO ===================== */
+let audioCtx;
+const freqs = [440, 554, 659, 330];
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
+  }
+  return audioCtx;
+}
+
+function playTone(i, duration = 400) {
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.frequency.value = freqs[i];
+  osc.type = 'sine';
+  gain.gain.value = 0.001;
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+
+  gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.01);
+
+  setTimeout(() => {
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    setTimeout(() => osc.stop(), 80);
+  }, duration);
+}
+
+function flashPad(i, duration = 400) {
+  const pad = document.getElementById('pad' + i);
+  pad.classList.add('active');
+  playTone(i, duration);
+  setTimeout(() => pad.classList.remove('active'), duration);
+}
+
+/* ===================== GAME LOGIC ===================== */
+function playSequence() {
+  playingSequence = true;
+  feedback.innerText = 'Watch the sequence...';
+
+  sequence.forEach((val, idx) => {
+    setTimeout(() => flashPad(val), 600 * (idx + 1));
+  });
+
+  setTimeout(() => {
+    playingSequence = false;
+    userIndex = 0;
+    feedback.innerText = 'Your turn!';
+  }, 600 * (sequence.length + 1));
+}
+
+function nextRound() {
+  level++;
+  levelDisplay.innerText = level;
+  sequence.push(Math.floor(Math.random() * 4));
+  roundDisplay.innerText = sequence.length;
+  playSequence();
+}
+
+function resetGame() {
+  sequence = [];
+  userIndex = 0;
+  level = 0;
+  playingSequence = false;
+  levelDisplay.innerText = 0;
+  roundDisplay.innerText = 0;
+  feedback.innerText = 'Game reset. Press Start.';
+  scoreArea.innerText = '--';
+  saveArea.innerHTML = '';
+}
+
+function endRound(success) {
+  saveArea.innerHTML = '';
+
+  if (success) {
+    feedback.innerHTML = '<span class="text-success">Correct! Next round...</span>';
+    lastScore = { level: level, correct: sequence.length };
+    scoreArea.innerText = `Level reached: ${level} — Correct inputs: ${sequence.length}`;
+    setTimeout(nextRound, 900);
+  } else {
+    feedback.innerHTML = '<span class="text-danger">Wrong sequence.</span>';
+    if (strictMode) {
+      feedback.innerHTML += ' Strict mode: restarting.';
+      setTimeout(resetGame, 1000);
+    } else {
+      feedback.innerHTML += ' Try again.';
+      setTimeout(playSequence, 1000);
+    }
+  }
+
+  saveArea.innerHTML = `
+    <button id="saveScoreBtn" class="btn btn-sm btn-success">Save Score</button>
+  `;
+  document.getElementById('saveScoreBtn').addEventListener('click', saveScore);
+}
+
+/* ===================== SAVE SCORE ===================== */
+function saveScore() {
+  const payload = {
+    score: lastScore.correct,
+    level: lastScore.level,
+    patient_id: "{{ patient.id|default:'' }}"
+  };
+
+  fetch("{% url 'remember_sequence_score' %}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCookie("csrftoken")
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    feedback.innerHTML += data.saved
+      ? ' <span class="text-success">Score saved.</span>'
+      : ' <span class="text-muted">Save failed.</span>';
+  })
+  .catch(() => {
+    feedback.innerHTML += ' <span class="text-muted">Server error.</span>';
+  });
+}
+
+/* ===================== EVENTS ===================== */
+pads.forEach(pad => {
+  pad.addEventListener('click', () => {
+    if (playingSequence) return;
+
+    const idx = parseInt(pad.dataset.color);
+    flashPad(idx, 150);
+
+    if (sequence[userIndex] === idx) {
+      userIndex++;
+      if (userIndex === sequence.length) endRound(true);
+    } else {
+      endRound(false);
+    }
+  });
+});
+
+startBtn.addEventListener('click', async () => {
+  await getAudioCtx().resume();
+  resetGame();
+  nextRound();
+});
+
+restartBtn.addEventListener('click', resetGame);
+
+strictBtn.addEventListener('click', () => {
+  strictMode = !strictMode;
+  strictBtn.innerText = `Strict: ${strictMode ? 'On' : 'Off'}`;
+});
+
+resetGame();
+</script>
+{% endblock %}

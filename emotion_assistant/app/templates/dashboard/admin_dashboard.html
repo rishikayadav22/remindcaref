@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+  <h3>📊 Admin Dashboard</h3>
+
+  <table class="table table-bordered mt-3">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Emotion Score</th>
+        <th>Therapy Sessions</th>
+        <th>Reminders Done</th>
+        <th>Last Active</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in progress %}
+      <tr>
+        <td>{{ p.user.username }}</td>
+        <td>{{ p.emotion_score }}</td>
+        <td>{{ p.therapy_sessions }}</td>
+        <td>{{ p.reminders_completed }}</td>
+        <td>{{ p.last_active }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">No users found</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

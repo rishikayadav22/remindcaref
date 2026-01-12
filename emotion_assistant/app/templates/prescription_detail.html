@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+  <div class="col-md-10 offset-md-1">
+    <h3>Prescription ({{ prescription.id }})</h3>
+    <p><strong>Patient:</strong> <a href="{% url 'dashboard' prescription.patient.id %}">{{ prescription.patient }}</a></p>
+    <p><strong>Uploaded at:</strong> {{ prescription.uploaded_at }}</p>
+    <h5>Image</h5>
+    <img src="{{ prescription.file.url }}" class="img-fluid mb-3">
+    <h5>OCR Text</h5>
+    <pre style="white-space:pre-wrap;">{{ prescription.ocr_text }}</pre>
+    <h5>Parsed Medications</h5>
+    {% if prescription.parsed_meds %}
+      <table class="table">
+        <thead><tr><th>Name</th><th>Dose</th><th>Freq</th><th>Raw line</th></tr></thead>
+        <tbody>
+          {% for m in prescription.parsed_meds %}
+          <tr>
+            <td>{{ m.name|default:"—" }}</td>
+            <td>{{ m.dose }}</td>
+            <td>{{ m.freq }}</td>
+            <td>{{ m.raw }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No meds parsed. {{ prescription.raw_parse_errors }}</p>
+    {% endif %}
+    <a href="{% url 'dashboard' prescription.patient.id %}" class="btn btn-secondary">Back</a>
+  </div>
+</div>
+{% endblock %}

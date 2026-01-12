@@ -1,0 +1,51 @@
+
+
+
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="page-title">Routines</h2>
+<p class="text-muted">Set up daily routines to help stay organized and on track.</p>
+
+<div class="row mt-4">
+    <!-- Morning Routine -->
+    <div class="col-md-6">
+        <div class="routine-card">
+            <div class="d-flex justify-content-between">
+                <h5>☀️ Morning Routine</h5>
+                <button class="btn btn-sm btn-outline-primary">Edit</button>
+            </div>
+            <ul>
+                <li>7:00 AM - Take morning medication</li>
+                <li>8:00 AM - Eat breakfast</li>
+                <li>8:30 AM - Go for a walk</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Evening Routine -->
+    <div class="col-md-6">
+        <div class="routine-card">
+            <div class="d-flex justify-content-between">
+                <h5>🌙 Evening Routine</h5>
+                <button class="btn btn-sm btn-outline-primary">Edit</button>
+            </div>
+            <ul>
+                <li>7:00 PM - Take evening medication</li>
+                <li>8:00 PM - Read or listen to music</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="text-center my-4">
+    <button class="btn btn-primary">+ Add New Routine</button>
+</div>
+
+<div class="inactive-box">
+    <h5>Inactive Routines</h5>
+    <p class="text-muted">No inactive routines found.</p>
+    <button class="btn btn-outline-secondary">View Routine History</button>
+</div>
+
+{% endblock %}

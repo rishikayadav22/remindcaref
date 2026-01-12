@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+
+  <!-- LEFT: Patient List -->
+  <div class="col-md-3">
+    <h5>Patients</h5>
+    <ul class="list-group">
+      {% for p in patients %}
+      <li class="list-group-item {% if patient and patient.id == p.id %}active{% endif %}">
+        <a href="{% url 'dashboard' p.id %}" class="text-decoration-none text-dark">
+          {{ p.first_name }} {{ p.last_name }}
+        </a>
+      </li>
+      {% empty %}
+      <li class="list-group-item">
+        No patients.
+        <a href="{% url 'patient_create' %}">Add one</a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <a class="btn btn-sm btn-primary mt-2" href="{% url 'patient_create' %}">
+      Add Patient
+    </a>
+  </div>
+
+  <!-- CENTER: Patient Details -->
+  <div class="col-md-6">
+
+    {% if patient %}
+    <!-- Patient Card -->
+    <div class="card mb-3 p-3">
+      <div class="d-flex">
+
+        {% if patient.photo %}
+          <img src="{{ patient.photo.url }}" width="120" height="120"
+               class="me-3 rounded-circle" style="object-fit:cover">
+        {% else %}
+          <img src="{% static 'app/img/default_avatar.png' %}" width="120" height="120"
+               class="me-3 rounded-circle" style="object-fit:cover">
+        {% endif %}
+
+        <div>
+          <h4>{{ patient.first_name }} {{ patient.last_name }}</h4>
+          <p>Age: {{ patient.age }} | Room: {{ patient.room }}</p>
+          <p>{{ patient.notes }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Camera -->
+    <div class="card mb-3 p-3">
+      <h5>Live Camera</h5>
+      <video id="video" width="480" height="360" autoplay playsinline
+             style="border:1px solid #ccc"></video>
+      <div class="mt-2">
+        <button id="captureBtn" class="btn btn-primary">Capture & Analyze</button>
+        <span id="emotionResult" class="ms-3"></span>
+      </div>
+    </div>
+
+    <!-- Snapshots -->
+    <div class="card mb-3 p-3">
+      <h5>Snapshots</h5>
+      <div class="row">
+        {% for s in patient.snapshots.all|slice:":6" %}
+        <div class="col-4 mb-2">
+          <img src="{{ s.image.url }}" class="img-fluid">
+          <small>{{ s.detected_emotion }} – {{ s.timestamp|date:"M d, Y H:i" }}</small>
+        </div>
+        {% empty %}
+        <div class="col-12">No snapshots yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% else %}
+      <div class="card p-3">
+        Select a patient to view details and run emotion detection.
+      </div>
+    {% endif %}
+
+  </div>
+
+  <!-- RIGHT: Actions -->
+  <div class="col-md-3">
+    <h5>Quick Actions</h5>
+
+    <a class="btn btn-outline-secondary mb-2 w-100"
+       href="{% url 'patient_create' %}">
+      Add Patient
+    </a>
+
+    {% if patient %}
+      <a class="btn btn-outline-secondary mb-2 w-100"
+         href="{% url 'upload_prescription' patient.id %}">
+        Upload Prescription
+      </a>
+
+      <a class="btn btn-warning mb-2 w-100"
+         href="{% url 'add_reminder' patient.id %}">
+        Add Reminder
+      </a>
+
+      <a class="btn btn-info mb-2 w-100"
+         href="{% url 'therapy_session' %}">
+        Therapy Session
+      </a>
+
+      <a class="btn btn-outline-primary mb-2 w-100"
+         href="{% url 'remember_sequence' %}?patient_id={{ patient.id }}">
+        Remember the Sequence
+      </a>
+
+      <button class="btn btn-danger w-100" onclick="triggerEmergency()">
+        🚨 Emergency
+      </button>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if patient %}
+<script>
+  const patientId = {{ patient.id }};
+</script>
+<script src="{% static 'app/js/emotion.js' %}"></script>
+<script src="{% static 'app/js/voice.js' %}"></script>
+{% endif %}
+
+<script>
+function triggerEmergency() {
+  alert("🚨 Emergency alert triggered! Caretaker notified.");
+}
+</script>
+{% endblock %}

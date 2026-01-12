@@ -1,0 +1,132 @@
+{% load static %}
+
+{# removed legacy commented HTML; main layout defined below #}
+<!doctype html>
+<html lang="en">
+{% load static %}
+
+<head>
+  <meta charset="utf-8">
+  <title>Emotion-Aware AI Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap (optional, keep if used elsewhere) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    {% include "partials/sidebar.html" %}
+
+    <!-- Main Content -->
+    <main class="content">
+
+      <!-- Reminder Controls (global) -->
+      
+
+
+      <!-- Page-specific content -->
+      {% block content %}{% endblock %}
+
+    </main>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Reminder Script -->
+  <script>
+    const startBtn = document.getElementById("startReminders");
+    const stopBtn = document.getElementById("stopReminders");
+
+    if (startBtn && stopBtn) {
+
+      function checkReminders() {
+        fetch("{% url 'reminders_json' %}")
+          .then(res => res.json())
+          .then(reminders => {
+            reminders.forEach(r => {
+
+              alert(`Reminder: ${r.message}`);
+
+              const audio = new Audio("{% static 'app/sounds/alert.mp3' %}");
+              audio.play().catch(() => {});
+
+              fetch(`/reminders/mark-seen/${r.id}/`, {
+                method: "POST",
+                headers: {
+                  "X-CSRFToken": "{{ csrf_token }}"
+                }
+              });
+            });
+          });
+      }
+
+      let reminderInterval = null;
+
+      startBtn.addEventListener("click", () => {
+        if (!reminderInterval) {
+          checkReminders();
+          reminderInterval = setInterval(checkReminders, 10000);
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+        }
+      });
+
+      stopBtn.addEventListener("click", () => {
+        clearInterval(reminderInterval);
+        reminderInterval = null;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      });
+    }
+  </script>
+
+  <!-- Chatbot Script -->
+  <script>
+    const sendBtn = document.getElementById("sendBtn");
+
+    if (sendBtn) {
+      sendBtn.addEventListener("click", sendMessage);
+
+      function sendMessage() {
+        const input = document.getElementById("chatInput");
+        const chatBox = document.getElementById("chat-box");
+
+        if (!input || !chatBox) return;
+
+        const message = input.value.trim();
+        if (!message) return;
+
+        chatBox.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+        input.value = "";
+
+        fetch("{% url 'chatbot_reply' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: JSON.stringify({ message })
+        })
+        .then(res => res.json())
+        .then(data => {
+          chatBox.innerHTML += `<p><strong>Bot:</strong> ${data.reply}</p>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        })
+        .catch(() => {
+          chatBox.innerHTML += `<p><strong>Error:</strong> Could not connect.</p>`;
+        });
+      }
+    }
+  </script>
+
+  {% block scripts %}{% endblock %}
+
+</body>
+</html>

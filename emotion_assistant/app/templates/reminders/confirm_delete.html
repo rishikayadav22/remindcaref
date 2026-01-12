@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="card">
+    <h2>Delete Reminder</h2>
+    <p>Are you sure you want to delete "{{ reminder.message }}" scheduled at {{ reminder.reminder_time }}?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+      <a href="{% url 'reminder_page' %}" class="btn btn-secondary" style="margin-left:8px;">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

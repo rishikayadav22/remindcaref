@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Emergency Contact</title>
+  <link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+
+  <style>
+    /* Force top alignment */
+    .page {
+      margin-left: 240px;          /* sidebar space */
+      padding: 20px 40px;
+      display: block;              /* REMOVE flex centering */
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      max-width: 420px;
+      padding: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .page {
+        margin-left: 0;
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="logo">ReMindCare</h2>
+    <nav class="menu">
+      <a href="{% url 'dashboard' %}" class="menu-item">🏠 Dashboard</a>
+      <a href="{% url 'routine_page' %}" class="menu-item">📋 Routines</a>
+      <a href="{% url 'reminder_page' %}" class="menu-item">⏰ Reminders</a>
+      <a href="{% url 'medication' %}" class="menu-item">💊 Medication</a>
+      <a href="{% url 'memory' %}" class="menu-item">🧠 Memory Log</a>
+      <a href="{% url 'family' %}" class="menu-item">📞 Call Family</a>
+      <a href="{% url 'profile' %}" class="menu-item">👤 Profile</a>
+      <a href="{% url 'logout' %}" class="menu-item logout">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <div class="page">
+    <h2>Edit Emergency Contact</h2>
+
+    <!-- <form method="post" action="" class="card">
+      {% csrf_token %}
+
+      <label>Name</label>
+      <input type="text" name="name" value="{{ emergency.name }}" required class="form-control"><br>
+
+      <label>Relation</label>
+      <input type="text" name="relation" value="{{ emergency.relation }}" required class="form-control"><br>
+
+      <label>Phone</label>
+      <input type="text" name="phone" value="{{ emergency.phone }}" required class="form-control">
+
+      <div style="margin-top:16px;">
+        <button type="submit" class="btn">Save</button>
+        <a href="{% url 'profile' %}" class="btn">Cancel</a>
+      </div>
+    </form> -->
+    <form method="post" enctype="multipart/form-data" class="card">
+      {% csrf_token %}
+
+      <label>Name</label>
+      <input type="text" name="name" value="{{ emergency.name }}" required class="form-control"><br><br>
+
+      <label>Relation</label>
+      <input type="text" name="relation" value="{{ emergency.relation }}" required class="form-control"><br><br>
+
+      <label>Phone</label>
+      <input type="text" name="phone" value="{{ emergency.phone }}" required class="form-control"><br><br>
+
+      <label>Photo</label>
+
+      {% if emergency.photo %}
+        <img src="{{ emergency.photo.url }}" class="preview">
+      {% endif %}
+
+      <input type="file" name="photo" accept="image/*" class="form-control">
+
+      <div style="margin-top:16px;">
+        <button type="submit" class="btn">Save</button>
+        <a href="{% url 'family' %}" class="btn">Cancel</a>
+      </div>
+    </form>
+  </div>
+  </div>
+</body>
+</html>

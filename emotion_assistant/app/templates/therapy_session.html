@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Therapy Session (AI Video Call)</h3>
+
+  <div class="row">
+    <!-- User Video -->
+    <div class="col-md-6">
+      <h6>You</h6>
+      <video id="userVideo" autoplay muted style="width:100%; border:1px solid #ccc;"></video>
+    </div>
+
+    <!-- AI Video -->
+    <div class="col-md-6">
+      <h6>AI Therapist</h6>
+      <img id="aiAvatar"
+      src="{% static 'app/ai_avatar_idle.png' %}"
+     style="width:100%; border:1px solid #ccc; border-radius: 10px; transition: opacity 0.5s;">
+
+    </div>
+  </div>
+
+  <!-- Captions -->
+  <div class="mt-3 p-2 border rounded" id="captionsBox" style="height:80px; overflow-y:auto; font-size:14px;"></div>
+
+  <!-- Chat History -->
+  <div class="mt-3 p-2 border rounded" id="chatHistory" style="height:150px; overflow-y:auto;"></div>
+
+  <div class="mt-3">
+    <button id="startTherapy" class="btn btn-primary">Start Session</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const userVideo = document.getElementById("userVideo");
+const aiAvatar = document.getElementById("aiAvatar");
+const captionsBox = document.getElementById("captionsBox");
+const chatHistory = document.getElementById("chatHistory");
+
+
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  .then(stream => userVideo.srcObject = stream)
+  .catch(err => console.error("Camera error:", err));
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.lang = "en-US";
+recognition.interimResults = false;
+recognition.continuous = false;
+
+document.getElementById("startTherapy").addEventListener("click", () => {
+  startListening();
+});
+
+function startListening() {
+  recognition.start();
+}
+
+recognition.addEventListener("result", (event) => {
+  const userText = event.results[0][0].transcript;
+  addToChat("You", userText);
+  showCaption(`You: ${userText}`);
+
+  switchAvatar("listening");
+
+  fetch("/chatbot/reply/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: userText })
+  })
+  .then(res => res.json())
+  .then(data => {
+  let formatted = data.reply
+    // bold markdown (**text**)
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    // bullet points (* text)
+    .replace(/\* (.*?)\n/g, "• $1<br>")
+    // handle multiple line breaks
+    .replace(/\n{2,}/g, "<br><br>")
+    // single line breaks
+    .replace(/\n/g, "<br>");
+
+  // Add formatted reply
+  chatHistory.innerHTML += `
+    <div class="p-2 mb-2 rounded" style="background:#f8f9fa; border:1px solid #ddd;">
+      <strong>AI:</strong><br>${formatted}
+    </div>`;
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+
+  // Also show captions
+  showCaption(`AI: ${data.reply}`);
+
+    const utter = new SpeechSynthesisUtterance(reply);
+    utter.onend = () => {
+      switchAvatar("idle");
+      startListening();
+    };
+    speechSynthesis.speak(utter);
+
+    switchAvatar("talking");
+  })
+  .catch(() => {
+    showCaption("Error: Could not connect to AI");
+  });
+});
+
+function addToChat(sender, text) {
+  chatHistory.innerHTML += `<p><strong>${sender}:</strong> ${text}</p>`;
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function showCaption(text) {
+  captionsBox.innerHTML = `<p>${text}</p>`;
+}
+
+function switchAvatar(mode) {
+    const basePath = "{{ STATIC_URL }}app/";
+    if (mode === "listening") {
+    aiAvatar.src = basePath + "ai_avatar_listening.png";
+  } else if (mode === "talking") {
+    aiAvatar.src = basePath + "ai_avatar_talking.png";
+  } else {
+    aiAvatar.src = basePath + "ai_avatar_idle.png";
+  }
+}
+</script>
+
+{% endblock %}

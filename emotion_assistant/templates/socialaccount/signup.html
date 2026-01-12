@@ -1,0 +1,198 @@
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Account</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #eef3ff, #f7faff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background: #fff;
+            padding: 38px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .auth-card p {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 26px;
+        }
+
+        /* Floating Input */
+        .form-group {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid #dce3f0;
+            font-size: 14px;
+            outline: none;
+            background: #fff;
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            transform: translateY(-50%);
+            font-size: 13px;
+            color: #999;
+            pointer-events: none;
+            background: #fff;
+            padding: 0 6px;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group input:not(:placeholder-shown) {
+            border-color: #4f8cff;
+        }
+
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: -6px;
+            font-size: 11px;
+            color: #4f8cff;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            margin-top: 12px;
+            background: linear-gradient(135deg, #4f8cff, #6aa8ff);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider span {
+            margin: 0 10px;
+        }
+
+        .social-btn {
+            width: 100%;
+            padding: 11px;
+            border-radius: 30px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .auth-footer {
+            margin-top: 18px;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .auth-footer a {
+            color: #4f8cff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="auth-card">
+    <h2>Create Account</h2>
+    <p>Personalized Cognitive Support</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <input type="email" name="email" required placeholder=" ">
+            <label>Email</label>
+        </div>
+
+        <div class="form-group">
+            <input type="text" name="username" required placeholder=" ">
+            <label>Username</label>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="password1" required placeholder=" ">
+            <label>Password</label>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="password2" required placeholder=" ">
+            <label>Confirm Password</label>
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Sign Up
+        </button>
+    </form>
+
+    <div class="divider">
+        <span>or</span>
+    </div>
+
+    <a href="{% provider_login_url 'google' %}">
+        <button class="social-btn" type="button">
+            Continue with Google
+        </button>
+    </a>
+
+    <div class="auth-footer">
+        Already have an account?
+        <a href="{% url 'login' %}">Sign in</a>
+    </div>
+</div>
+
+</body>
+</html>

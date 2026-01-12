@@ -1,0 +1,9 @@
+<h2>Edit {{ routine.name }}</h2>
+
+<ul>
+    {% for task in routine.tasks.all %}
+        <li>{{ task.time }} - {{ task.description }}</li>
+    {% endfor %}
+</ul>
+
+<p>(Editing form coming next)</p>

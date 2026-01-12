@@ -1,0 +1,400 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Profile</title>
+<link rel="stylesheet" href="{% static 'app/css/dashboard.css' %}">
+<style>
+/* --- SAME CSS AS YOU WROTE (UNCHANGED) --- */
+
+/* Dark mode overrides */
+body.dark-mode {
+  background: #0b1220;
+  color: #e6eef8;
+  transition: background-color 240ms ease, color 240ms ease;
+}
+/* Layout */
+body.dark-mode .layout,
+body.dark-mode .content {
+  background: transparent;
+}
+body.dark-mode .sidebar {
+  background: #071020;
+  color: #cbd5e1;
+  border-right: 1px solid rgba(255,255,255,0.03);
+}
+body.dark-mode .logo {
+  color: #e6eef8;
+}
+body.dark-mode .menu-item {
+  color: #cbd5e1;
+}
+body.dark-mode .menu-item.active {
+  color: #f8fafc;
+}
+body.dark-mode .breadcrumb {
+  color: #9fb4cc;
+}
+/* Cards and content */
+body.dark-mode .card {
+  background: #0f1724;
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #dbe9fb;
+}
+body.dark-mode h2, body.dark-mode h3 {
+  color: #e6eef8;
+}
+body.dark-mode .muted {
+  color: #9fb4cc;
+}
+body.dark-mode .profile-info h3 {
+  color: #e6eef8;
+}
+/* Buttons & controls */
+body.dark-mode .btn {
+  background: #1f2937;
+  color: #e6eef8;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+body.dark-mode .btn:hover {
+  background: #111827;
+}
+body.dark-mode .delete {
+  background: #4b1515;
+  color: #ffecec;
+}
+body.dark-mode .setting { 
+  border-bottom-color: rgba(255,255,255,0.03);
+}
+/* Forms */
+body.dark-mode input.form-control,
+body.dark-mode select.form-control,
+body.dark-mode textarea {
+  background: #0b1220;
+  color: #e6eef8;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+body.dark-mode select.form-control option {
+  background: #0b1220;
+  color: #e6eef8;
+}
+/* Avatar */
+body.dark-mode .avatar {
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+/* Misc */
+body.dark-mode .empty,
+body.dark-mode .routine-time,
+body.dark-mode .routine-title,
+body.dark-mode .subtitle {
+  color: #9fb4cc;
+}
+
+/* Font size helpers */
+body.font-small { font-size: 13px; }
+body.font-medium { font-size: 16px; }
+body.font-large { font-size: 20px; }
+
+/* Apply across common elements */
+body.font-small p,
+body.font-small .muted,
+body.font-small .menu-item,
+body.font-small .breadcrumb,
+body.font-small .setting span,
+body.font-small .profile-info h3,
+body.font-small .card h3,
+body.font-small input,
+body.font-small select,
+body.font-small textarea,
+body.font-small .btn,
+body.font-small .danger,
+body.font-small .ec {
+  font-size: 13px;
+}
+
+body.font-medium p,
+body.font-medium .muted,
+body.font-medium .menu-item,
+body.font-medium .breadcrumb,
+body.font-medium .setting span,
+body.font-medium .profile-info h3,
+body.font-medium .card h3,
+body.font-medium input,
+body.font-medium select,
+body.font-medium textarea,
+body.font-medium .btn,
+body.font-medium .danger,
+body.font-medium .ec {
+  font-size: 16px;
+}
+
+body.font-large p,
+body.font-large .muted,
+body.font-large .menu-item,
+body.font-large .breadcrumb,
+body.font-large .setting span,
+body.font-large .profile-info h3,
+body.font-large .card h3,
+body.font-large input,
+body.font-large select,
+body.font-large textarea,
+body.font-large .btn,
+body.font-large .danger,
+body.font-large .ec {
+  font-size: 20px;
+}
+
+/* Headline scaling */
+body.font-small h2 { font-size: 20px; }
+body.font-medium h2 { font-size: 24px; }
+body.font-large h2 { font-size: 28px; }
+
+body.font-small h3 { font-size: 16px; }
+body.font-medium h3 { font-size: 20px; }
+body.font-large h3 { font-size: 22px; }
+
+/* Buttons, avatars and form size tuning */
+body.font-small .btn { font-size: 12px; padding: 6px 10px; }
+body.font-medium .btn { font-size: 14px; padding: 8px 14px; }
+body.font-large .btn { font-size: 16px; padding: 10px 16px; }
+
+body.font-small .avatar { width: 64px; height: 64px; }
+body.font-medium .avatar { width: 80px; height: 80px; }
+body.font-large .avatar { width: 96px; height: 96px; }
+
+body.font-small .ec-avatar { width: 40px; height: 40px; }
+body.font-medium .ec-avatar { width: 48px; height: 48px; }
+body.font-large .ec-avatar { width: 56px; height: 56px; }
+
+</style>
+</head>
+
+<body class="{% if profile.dark_mode %}dark-mode{% endif %}{% if profile.font_size %} font-{{ profile.font_size|lower }}{% endif %}">
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2 class="logo">ReMindCare</h2>
+
+    <nav class="menu">
+      <a href="{% url 'dashboard' %}" class="menu-item">🏠 Dashboard</a>
+      <a href="{% url 'routine_page' %}" class="menu-item">📋 Routines</a>
+      <a href="{% url 'reminder_page' %}" class="menu-item">⏰ Reminders</a>
+      <a href="{% url 'medication' %}" class="menu-item">💊 Medication</a>
+      <a href="{% url 'memory' %}" class="menu-item">🧠 Memory Log</a>
+      <a href="{% url 'family' %}" class="menu-item">📞 Call Family</a>
+      <a href="{% url 'profile' %}" class="menu-item">👤 Profile</a>
+      <a href="{% url 'logout' %}" class="menu-item logout">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="content">
+
+    <p class="breadcrumb">&lt;&lt; AI Assistive › Profile</p>
+    <h2>Profile</h2>
+
+    <!-- PROFILE CARD -->
+    <div class="card profile-card">
+      <div class="profile-left">
+        {% if profile.avatar %}
+          <img src="{{ profile.avatar.url }}" class="avatar">
+        {% else %}
+          <img src="{% static 'app/images/robot.png' %}" class="avatar">
+        {% endif %}
+
+        <div class="profile-info">
+          <h3>{{ request.user.get_full_name|default:request.user.username }}</h3>
+          <p class="muted">Primary User</p>
+          <p class="muted">{{ request.user.email }}</p>
+          <p class="muted">{{ profile.phone }}</p>
+        </div>
+      </div><br>
+
+      <!-- ✅ EDIT PROFILE -->
+      <a href="{% url 'edit_profile' %}" class="btn edit-btn">✏️ Edit</a>
+    </div>
+
+    <!-- GRID -->
+    <div class="profile-grid">
+
+      <!-- LEFT COLUMN -->
+      <div>
+
+        <!-- EMERGENCY CONTACT -->
+        <div class="card">
+          <h3>Emergency Contact</h3><br>
+
+          {% if emergency %}
+            <div class="ec">
+              <img src="{% static 'app/images/avatar.jpg' %}" class="ec-avatar">
+              <div>
+                <strong>{{ emergency.name }}</strong>
+                <p class="muted">{{ emergency.relation }}</p>
+                <p>{{ emergency.phone }}</p>
+              </div><br>
+              <a href="{% url 'edit_emergency' emergency.id %}" class="btn">✏️ Edit</a>
+            </div>
+          {% else %}
+            <p class="muted">No emergency contact</p><br>
+            <a href="{% url 'add_emergency' %}" class="btn">➕ Add</a>
+          {% endif %}
+        </div>
+
+        <!-- PLAYBACK SPEED -->
+        <div class="card">
+          <form id="playback-form" method="post" action="/profile/change-playback-speed/" class="setting">
+            {% csrf_token %}
+            <span>🔊 Playback Speed</span>
+            <div>
+              <strong>Current: {{ profile.playback_speed }}</strong>
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+              <label for="speed-select" class="muted">Set speed</label>
+              <select id="speed-select" name="speed" class="form-control">
+                <option value="Slow" {% if profile.playback_speed == 'Slow' %}selected{% endif %}>Slow</option>
+                <option value="Normal" {% if profile.playback_speed == 'Normal' %}selected{% endif %}>Normal</option>
+                <option value="Fast" {% if profile.playback_speed == 'Fast' %}selected{% endif %}>Fast</option>
+              </select>
+              <button type="submit" class="btn">Save</button>
+            </div>
+          </form>
+        </div>
+
+        
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+
+        <div class="card">
+          <h3>Settings & Preferences</h3>
+
+          
+
+          <!-- DARK MODE -->
+          <div class="setting">
+            <span>🌙 Dark Mode</span>
+            <button class="btn" onclick="toggleDarkMode()">Toggle</button>
+          </div>
+
+          
+
+          <!-- DELETE -->
+          <form method="post" action="{% url 'delete_account' %}" class="danger">
+            {% csrf_token %}
+            <span>🗑 Delete Account</span>
+            <button class="delete"
+              onclick="return confirm('This will permanently delete your account. Continue?')">
+              Delete
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- DARK MODE JS -->
+<script>
+function toggleDarkMode() {
+  fetch("/profile/toggle-dark-mode/", { credentials: 'same-origin' })
+    .then((res) => {
+      if (res.ok) {
+        location.reload();
+      } else {
+        alert('Could not toggle dark mode (not authorized).');
+      }
+    })
+    .catch(() => alert('Network error toggling dark mode'));
+}
+</script>
+
+<!-- FONT SIZE JS -->
+<script>
+// submit font size form by fetch and apply immediately
+document.getElementById('font-form')?.addEventListener('submit', function(e){
+  e.preventDefault();
+  const form = this;
+  const fd = new FormData(form);
+  fetch(form.action, { method: 'POST', body: fd, credentials: 'same-origin' })
+    .then(res => {
+      if (res.ok) {
+        const selected = form.querySelector('#font-select').value.toLowerCase();
+        document.body.classList.remove('font-small','font-medium','font-large');
+        document.body.classList.add('font-' + selected);
+      } else {
+        location.reload();
+      }
+    })
+    .catch(()=> location.reload());
+});
+</script>
+
+<script>
+// convenience: wire "Change" controls to scroll and focus the right form
+(function(){
+  function bindForText(matchText, selectorToScroll, focusSelector) {
+    // don't attach handlers to FORM elements (they can contain submit buttons)
+    document.querySelectorAll('.card .setting, .card a.setting, .card button').forEach(function(node){
+      try {
+        if (node.tagName && node.tagName.toLowerCase() === 'form') return;
+        const text = (node.innerText || '').trim();
+        if (!text) return;
+        if (text.includes(matchText)) {
+          node.addEventListener('click', function(e){
+            e.preventDefault();
+            const el = document.querySelector(selectorToScroll);
+            if (el) {
+              el.scrollIntoView({behavior: 'smooth', block: 'center'});
+              setTimeout(function(){
+                const f = el.querySelector(focusSelector);
+                if (f && typeof f.focus === 'function') f.focus();
+              }, 120);
+            }
+          });
+        }
+      } catch (err) { /* ignore */ }
+    });
+  }
+
+  bindForText('Font Size', '#font-form', '#font-select');
+  bindForText('🔠 Font Size', '#font-form', '#font-select');
+  bindForText('Playback Speed', '#playback-form', '#speed-select');
+  bindForText('🔊 Playback Speed', '#playback-form', '#speed-select');
+
+  // Submit playback form by fetch so we can update UI without reload
+  document.getElementById('playback-form')?.addEventListener('submit', function(e){
+    e.preventDefault();
+    const form = this;
+    const fd = new FormData(form);
+
+    fetch(form.action, { method: 'POST', body: fd, credentials: 'same-origin' })
+      .then(res => {
+        if (res.ok) {
+          const selected = form.querySelector('#speed-select').value;
+          const current = form.querySelector('div > strong');
+          if (current) current.innerText = 'Current: ' + selected;
+        } else {
+          // fallback to full reload on error
+          location.reload();
+        }
+      })
+      .catch(()=> location.reload());
+  });
+
+})();
+</script>
+
+</body>
+</html> 
