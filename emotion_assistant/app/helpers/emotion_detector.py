@@ -17,3 +17,7 @@ def detect_emotion(frame):
     except Exception as e:
         print("Emotion error:", e)
         return "Unknown"
+def detect_emotion(img):
+    from deepface import DeepFace
+    result = DeepFace.analyze(img, actions=['emotion'])
+    return result
